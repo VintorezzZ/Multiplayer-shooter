@@ -5,13 +5,23 @@ using UnityEngine;
 public class PlayerInputController : MonoBehaviour
 {
     [SerializeField] private PlayerController _player;
+    [SerializeField] private float _mouseSens = 1f;
 
     private void Update()
     {
         var h = Input.GetAxisRaw("Horizontal");
         var v = Input.GetAxisRaw("Vertical");
 
-        _player.SetInput(h, v);
+        var mouseX = Input.GetAxis("Mouse X");
+        var mouseY = Input.GetAxis("Mouse Y");
+
+        var jumpInput = Input.GetKeyDown(KeyCode.Space);
+
+        _player.SetInput(h, v, mouseX * _mouseSens);
+        _player.RotateX(-mouseY * _mouseSens);
+
+        if (jumpInput)
+            _player.Jump();
 
         SendMoveStateToServer();
     }
