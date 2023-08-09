@@ -50,7 +50,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc9333a7fda547acad8c351118f87fca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <MaxSpeed>k__BackingField: 2
+  <Speed>k__BackingField: 10
   _rigidbody: {fileID: 5285447148964390447}
   _head: {fileID: 6519223643394544954}
   _cameraPoint: {fileID: 4076749546326655649}

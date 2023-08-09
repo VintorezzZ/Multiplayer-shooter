@@ -42,7 +42,7 @@ public class PlayerController : Character
 
     private void Move()
     {
-        var velocity = (transform.forward * _inputV + transform.right * _inputH).normalized * MaxSpeed;
+        var velocity = (transform.forward * _inputV + transform.right * _inputH).normalized * Speed;
         velocity.y = _rigidbody.velocity.y;
         Velocity = velocity;
         _rigidbody.velocity = Velocity;
@@ -72,9 +72,12 @@ public class PlayerController : Character
         _rigidbody.AddForce(0, _jumpForce, 0, ForceMode.VelocityChange);
     }
 
-    public void GetMoveInfo(out Vector3 position, out Vector3 velocity)
+    public void GetMoveInfo(out Vector3 position, out Vector3 velocity, out float rotateX, out float rotateY)
     {
         position = transform.position;
         velocity = _rigidbody.velocity;
+
+        rotateY = transform.eulerAngles.y;
+        rotateX = _head.localEulerAngles.x;
     }
 }

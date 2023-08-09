@@ -21,7 +21,12 @@ namespace Multiplayer
 
         private async Task Connect()
         {
-            _room = await Instance.client.JoinOrCreate<State>("state_handler");
+            var data = new Dictionary<string, object>()
+            {
+                { "speed", _player.Speed }
+            };
+
+            _room = await Instance.client.JoinOrCreate<State>("state_handler", data);
 
             _room.OnStateChange += OnStateChange;
         }
@@ -53,7 +58,7 @@ namespace Multiplayer
         {
             var pos = new Vector3(player.pX , player.pY, player.pZ);
             var enemy = Instantiate(_enemy, pos, Quaternion.identity);
-            player.OnChange += enemy.OnChange;
+            enemy.Init(player);
         }
 
         private void RemoveEnemy(string key, Player player)

@@ -2,21 +2,33 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Colyseus.Schema;
+using DefaultNamespace;
 using UnityEngine;
 
-public class EnemyController : MonoBehaviour
+public class EnemyController : Character
 {
     private const int MAX_RECEIVED_TIME_INTERVALS_COUNT = 5;
+
+    [SerializeField] private Transform _head;
 
     public Vector3 TargetPosition { get; private set; } = Vector3.zero;
     private float _velocityMagnitude = 0f;
 
     private readonly Queue<float> _receivedTimeInterval = new Queue<float>();
     private float _lastReceivedTime = 0f;
+    private Player _player;
 
     private void Start()
     {
         TargetPosition = transform.position;
+    }
+
+    public void Init(Player player)
+    {
+        _player = player;
+        SetSpeed(_player.speed);
+
+        player.OnChange += OnChange;
     }
 
     private void Update()
@@ -32,10 +44,27 @@ public class EnemyController : MonoBehaviour
     }
 
     // in - передача по ссылке без возможности модификаций
+
     private void SetMovement(in Vector3 position, in Vector3 velocity, float averageInterval)
     {
         TargetPosition = position + (velocity * averageInterval);
-        _velocityMagnitude = velocity.magnitude;
+        Velocity = velocity;
+        _velocityMagnitude = Velocity.magnitude;
+    }
+
+    public void SetSpeed(float value)
+    {
+        Speed = value;
+    }
+
+    public void SetRotateX(float value)
+    {
+        _head.localEulerAngles = new Vector3(value, 0, 0);
+    }
+
+    public void SetRotateY(float value)
+    {
+        transform.localEulerAngles = new Vector3(0, value, 0);
     }
 
     private void UpdateReceivedTime()
@@ -54,7 +83,7 @@ public class EnemyController : MonoBehaviour
         UpdateReceivedTime();
 
         var position = TargetPosition;
-        var velocity = Vector3.zero;
+        var velocity = Velocity;
 
         foreach (var dataChange in changes)
         {
@@ -68,11 +97,20 @@ public class EnemyController : MonoBehaviour
                 case "vY": velocity.y = (float) dataChange.Value; break;
                 case "vZ": velocity.z = (float) dataChange.Value; break;
 
+                case "rX": SetRotateX((float) dataChange.Value); break;
+                case "rY": SetRotateY((float) dataChange.Value); break;
+
                 default: Debug.LogWarning("incorrect field " + dataChange.Field);
                     break;
             }
         }
 
         SetMovement(position, velocity, _receivedTimeInterval.Average());
+    }
+
+    public void Dispose()
+    {
+        _player.OnChange -= OnChange;
+        Destroy(gameObject);
     }
 }

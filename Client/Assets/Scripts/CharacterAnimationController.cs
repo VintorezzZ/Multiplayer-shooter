@@ -13,7 +13,7 @@ public class CharacterAnimationController : MonoBehaviour
     private void Update()
     {
         var localVelocity = _character.transform.InverseTransformVector(_character.Velocity);
-        var speed = localVelocity.magnitude / _character.MaxSpeed;
+        var speed = localVelocity.magnitude / _character.Speed;
         var sign = Mathf.Sign(localVelocity.z);
 
         _animator.SetFloat(Speed, speed * sign);

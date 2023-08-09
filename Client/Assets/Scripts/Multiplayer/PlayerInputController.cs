@@ -28,7 +28,7 @@ public class PlayerInputController : MonoBehaviour
 
     private void SendMoveStateToServer()
     {
-        _player.GetMoveInfo(out Vector3 position, out Vector3 velocity);
+        _player.GetMoveInfo(out Vector3 position, out Vector3 velocity, out float rotateX, out float rotateY);
 
         var data = new Dictionary<string, object>()
         {
@@ -37,7 +37,9 @@ public class PlayerInputController : MonoBehaviour
             {"pZ", position.z},
             {"vX", velocity.x},
             {"vY", velocity.y},
-            {"vZ", velocity.z}
+            {"vZ", velocity.z},
+            {"rX", rotateX},
+            {"rY", rotateY}
         };
 
         MultiplayerManager.Instance.SendMessageToServer("move", data);
