@@ -1,21 +1,23 @@
 ﻿using System;
+using DefaultNamespace;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : Character
 {
     [SerializeField] private Rigidbody _rigidbody;
-    [SerializeField] private float _speed = 2f;
     [SerializeField] private Transform _head;
     [SerializeField] private Transform _cameraPoint;
     [SerializeField] private float _minHeadAngle = -90f;
     [SerializeField] private float _maxHeadAngle = 90f;
     [SerializeField] private float _jumpForce = 10f;
+    [SerializeField] private float _jumpDelay = .2f;
+    [SerializeField] private GroundChecker _groundChecker;
 
     private float _inputH;
     private float _inputV;
     private float _rotateY;
     private float _currentRotateX;
-    private bool _isGrounded = true;
+    private float _lastJumpTime;
 
     private void Start()
     {
@@ -40,12 +42,10 @@ public class PlayerController : MonoBehaviour
 
     private void Move()
     {
-        //var direction = new Vector3(_inputH, 0, _inputV).normalized;
-        //transform.position += direction * _speed * Time.deltaTime;
-
-        var velocity = (transform.forward * _inputV + transform.right * _inputH).normalized * _speed;
+        var velocity = (transform.forward * _inputV + transform.right * _inputH).normalized * MaxSpeed;
         velocity.y = _rigidbody.velocity.y;
-        _rigidbody.velocity = velocity;
+        Velocity = velocity;
+        _rigidbody.velocity = Velocity;
     }
 
     private void RotateY()
@@ -62,9 +62,13 @@ public class PlayerController : MonoBehaviour
 
     public void Jump()
     {
-        if (!_isGrounded)
+        if (!_groundChecker.IsGrounded)
             return;
 
+        if (Time.time - _lastJumpTime < _jumpDelay)
+            return;
+
+        _lastJumpTime = Time.time;
         _rigidbody.AddForce(0, _jumpForce, 0, ForceMode.VelocityChange);
     }
 
@@ -72,22 +76,5 @@ public class PlayerController : MonoBehaviour
     {
         position = transform.position;
         velocity = _rigidbody.velocity;
-    }
-
-
-    private void OnCollisionStay(Collision collision)
-    {
-        var contactPoints = collision.contacts;
-
-        foreach (var contactPoint in contactPoints)
-        {
-            if (contactPoint.normal.y > 0.45f)
-                _isGrounded = true;
-        }
-    }
-
-    private void OnCollisionExit(Collision other)
-    {
-        _isGrounded = false;
     }
 }
