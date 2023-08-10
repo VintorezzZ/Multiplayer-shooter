@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4690996846976983309}
   - component: {fileID: 2140387011925666883}
   - component: {fileID: 2817007475741775900}
-  - component: {fileID: 2153619048526785086}
+  - component: {fileID: 21791821972098231}
   - component: {fileID: 9187915371012474114}
   - component: {fileID: 5285447148964390447}
   - component: {fileID: 7068471908252663501}
@@ -75,7 +75,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _player: {fileID: 2626656441025501335}
   _mouseSens: 1
-  _weapon: {fileID: 2153619048526785086}
+  _weapon: {fileID: 21791821972098231}
 --- !u!114 &2140387011925666883
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -108,7 +108,7 @@ MonoBehaviour:
     m_Bits: 64
   _radius: 0.2
   _coyoteTime: 0.15
---- !u!114 &2153619048526785086
+--- !u!114 &21791821972098231
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -117,12 +117,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 611419579581376413}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 971792c74cc5c3848ace05699f0ea586, type: 3}
+  m_Script: {fileID: 11500000, guid: 5bc545bd5938495ea01f6c534f80ad1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _bulletPrefab: {fileID: 4909414486430137167, guid: 08f2c0dc07635da43b08fd7229c27825, type: 3}
   _bulletPoint: {fileID: 7334590345470635759}
-  _bulletSpeed: 20
+  _bulletSpeed: 10
   _shootDelay: 0.2
 --- !u!114 &9187915371012474114
 MonoBehaviour:
@@ -136,7 +136,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1832385439274af46a3c117307e913fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _weapon: {fileID: 2153619048526785086}
+  _weapon: {fileID: 21791821972098231}
   _animator: {fileID: 2626365747766860086}
 --- !u!54 &5285447148964390447
 Rigidbody:

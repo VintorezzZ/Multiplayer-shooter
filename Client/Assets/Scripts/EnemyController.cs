@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Armory.Weapons;
 using Colyseus.Schema;
-using DefaultNamespace;
 using UnityEngine;
 
 public class EnemyController : Character
@@ -10,6 +10,7 @@ public class EnemyController : Character
     private const int MAX_RECEIVED_TIME_INTERVALS_COUNT = 5;
 
     [SerializeField] private Transform _head;
+    [SerializeField] private EntityWeapon _weapon;
 
     public Vector3 TargetPosition { get; private set; } = Vector3.zero;
     private float _velocityMagnitude = 0f;
@@ -65,6 +66,14 @@ public class EnemyController : Character
     public void SetRotateY(float value)
     {
         transform.localEulerAngles = new Vector3(0, value, 0);
+    }
+
+    public void Shoot(in ShootInfo shootInfo)
+    {
+        var position = new Vector3(shootInfo.PosX, shootInfo.PosY, shootInfo.PosZ);
+        var velocity = new Vector3(shootInfo.DirX, shootInfo.DirY, shootInfo.DirZ);
+
+        _weapon.Shoot(position, velocity);
     }
 
     private void UpdateReceivedTime()

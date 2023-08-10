@@ -11,6 +11,8 @@ namespace Multiplayer
         [SerializeField] private EnemyController _enemy;
 
         private ColyseusRoom<State> _room;
+        private Dictionary<string, EnemyController> _enemies = new Dictionary<string, EnemyController>();
+
         protected override void Awake()
         {
             base.Awake();
@@ -29,6 +31,20 @@ namespace Multiplayer
             _room = await Instance.client.JoinOrCreate<State>("state_handler", data);
 
             _room.OnStateChange += OnStateChange;
+            _room.OnMessage<string>("Shoot", ApplyShootFromServer);
+        }
+
+        private void ApplyShootFromServer(string shootInfoJson)
+        {
+            var shootInfo = JsonUtility.FromJson<ShootInfo>(shootInfoJson);
+
+            if (!_enemies.ContainsKey(shootInfo.Key))
+            {
+                Debug.LogError("Enemy doesn't exist!");
+                return;
+            }
+
+            _enemies[shootInfo.Key].Shoot(shootInfo);
         }
 
         private void OnStateChange(State state, bool isfirststate)
@@ -59,14 +75,26 @@ namespace Multiplayer
             var pos = new Vector3(player.pX , player.pY, player.pZ);
             var enemy = Instantiate(_enemy, pos, Quaternion.identity);
             enemy.Init(player);
+
+            _enemies.Add(key, enemy);
         }
 
         private void RemoveEnemy(string key, Player player)
         {
+            if (!_enemies.ContainsKey(key))
+                return;
 
+            var enemy = _enemies[key];
+            enemy.Dispose();
+            _enemies.Remove(key);
         }
 
         public void SendMessageToServer(string key, Dictionary<string, object> data)
+        {
+            _room.Send(key, data);
+        }
+
+        public void SendMessageToServer(string key, string data)
         {
             _room.Send(key, data);
         }
@@ -76,6 +104,11 @@ namespace Multiplayer
             base.OnDestroy();
 
             _room?.Leave();
+        }
+
+        public string GetSessionId()
+        {
+            return _room.SessionId;
         }
     }
 }

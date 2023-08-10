@@ -1,28 +1,27 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Armory.Weapons;
 using UnityEngine;
 
-public class WeaponAnimationController : MonoBehaviour
+namespace Armory.Weapons
 {
-    private static readonly int WeaponShoot = Animator.StringToHash("Shoot");
-
-    [SerializeField] private Weapon _weapon;
-    [SerializeField] private Animator _animator;
-
-    void Start()
+    public class WeaponAnimationController : MonoBehaviour
     {
-        _weapon.WeaponShoot += Shoot;
-    }
+        private static readonly int WeaponShoot = Animator.StringToHash("Shoot");
 
-    private void Shoot()
-    {
-        _animator.SetTrigger(WeaponShoot);
-    }
+        [SerializeField] private Weapon _weapon;
+        [SerializeField] private Animator _animator;
 
-    private void OnDestroy()
-    {
-        _weapon.WeaponShoot -= Shoot;
+        void Start()
+        {
+            _weapon.ShootAction += Shoot;
+        }
+
+        private void Shoot()
+        {
+            _animator.SetTrigger(WeaponShoot);
+        }
+
+        private void OnDestroy()
+        {
+            _weapon.ShootAction -= Shoot;
+        }
     }
 }

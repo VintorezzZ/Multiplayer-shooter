@@ -7,8 +7,14 @@ public class PlayerInputController : MonoBehaviour
 {
     [SerializeField] private PlayerController _player;
     [SerializeField] private float _mouseSens = 1f;
-    [SerializeField] private Weapon _weapon;
+    [SerializeField] private ClientWeapon _weapon;
 
+    private MultiplayerManager _multiplayerManager;
+
+    private void Start()
+    {
+        _multiplayerManager = MultiplayerManager.Instance;
+    }
 
     private void Update()
     {
@@ -28,8 +34,8 @@ public class PlayerInputController : MonoBehaviour
         if (jumpInput)
             _player.Jump();
 
-        if (isShoot)
-            _weapon.Shoot();
+        if (isShoot && _weapon.TryShoot(out var shootInfo))
+            SendShootInfoToServer(ref shootInfo);
 
         SendMoveStateToServer();
     }
@@ -50,6 +56,27 @@ public class PlayerInputController : MonoBehaviour
             {"rY", rotateY}
         };
 
-        MultiplayerManager.Instance.SendMessageToServer("move", data);
+        _multiplayerManager.SendMessageToServer("move", data);
     }
+
+    private void SendShootInfoToServer(ref ShootInfo shootInfo)
+    {
+        shootInfo.Key = _multiplayerManager.GetSessionId();
+        var json = JsonUtility.ToJson(shootInfo);
+        _multiplayerManager.SendMessageToServer("shoot", json);
+    }
+}
+
+[System.Serializable]
+public struct ShootInfo
+{
+    public string Key;
+
+    public float DirX;
+    public float DirY;
+    public float DirZ;
+
+    public float PosX;
+    public float PosY;
+    public float PosZ;
 }
