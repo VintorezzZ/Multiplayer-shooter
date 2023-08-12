@@ -2,6 +2,10 @@ import { Room, Client } from "colyseus";
 import { Schema, type, MapSchema } from "@colyseus/schema";
 
 export class Player extends Schema {
+    @type("int8")
+    currHp = 0;
+    @type("int8")
+    maxHp = 0;
     @type("number")
     speed = 0;
 
@@ -34,6 +38,8 @@ export class State extends Schema {
     createPlayer(sessionId: string, data: any) {
         const player = new Player();
         player.speed = data.speed;
+        player.maxHp = data.hp;
+        player.currHp = data.hp;
 
         this.players.set(sessionId, player);
     }
@@ -67,12 +73,18 @@ export class StateHandlerRoom extends Room<State> {
         this.setState(new State());
 
         this.onMessage("move", (client, data) => {
-            console.log("StateHandlerRoom received message from", client.sessionId, ":", data);
+            //console.log("StateHandlerRoom received message from", client.sessionId, ":", data);
             this.state.movePlayer(client.sessionId, data);
         });
 
         this.onMessage("shoot", (client, data) => {
             this.broadcast("Shoot", data, {except: client})
+        });
+
+        this.onMessage("dmg", (client, data) => {
+            const player = this.state.players.get(data.id)
+            player.currHp -= data.value;
+            console.log("Received msg: dmg", ":", data)
         });
     }
 

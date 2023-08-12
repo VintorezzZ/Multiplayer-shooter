@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Armory.Weapons;
 using Colyseus.Schema;
+using DefaultNamespace;
+using Multiplayer;
 using UnityEngine;
 
 public class EnemyController : Character
@@ -11,6 +13,7 @@ public class EnemyController : Character
 
     [SerializeField] private Transform _head;
     [SerializeField] private EntityWeapon _weapon;
+    [SerializeField] private HealthController _healthController;
 
     public Vector3 TargetPosition { get; private set; } = Vector3.zero;
     private float _velocityMagnitude = 0f;
@@ -18,16 +21,19 @@ public class EnemyController : Character
     private readonly Queue<float> _receivedTimeInterval = new Queue<float>();
     private float _lastReceivedTime = 0f;
     private Player _player;
+    private string _sessionId;
 
     private void Start()
     {
         TargetPosition = transform.position;
     }
 
-    public void Init(Player player)
+    public void Init(Player player, string sessionId)
     {
+        _sessionId = sessionId;
         _player = player;
         SetSpeed(_player.speed);
+        SetMaxHealth(_player.maxHp);
 
         player.OnChange += OnChange;
     }
@@ -68,6 +74,13 @@ public class EnemyController : Character
         transform.localEulerAngles = new Vector3(0, value, 0);
     }
 
+    public void SetMaxHealth(int value)
+    {
+        MaxHealth = value;
+        _healthController.SetMax(value);
+        _healthController.SetCurrent(value);
+    }
+
     public void Shoot(in ShootInfo shootInfo)
     {
         var position = new Vector3(shootInfo.PosX, shootInfo.PosY, shootInfo.PosZ);
@@ -85,6 +98,19 @@ public class EnemyController : Character
 
         if (_receivedTimeInterval.Count > MAX_RECEIVED_TIME_INTERVALS_COUNT)
             _receivedTimeInterval.Dequeue();
+    }
+
+    public void ApplyDamage(int damage)
+    {
+        _healthController.ApplyDamage(damage);
+
+        var data = new Dictionary<string, object>()
+        {
+            {"id", _sessionId},
+            {"value", damage}
+        };
+
+        MultiplayerManager.Instance.SendMessageToServer("dmg", data);
     }
 
     public void OnChange(List<DataChange> changes)

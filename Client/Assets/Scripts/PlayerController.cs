@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using Colyseus.Schema;
+using DefaultNamespace;
 using UnityEngine;
 
 public class PlayerController : Character
@@ -11,6 +14,7 @@ public class PlayerController : Character
     [SerializeField] private float _jumpForce = 10f;
     [SerializeField] private float _jumpDelay = .2f;
     [SerializeField] private GroundChecker _groundChecker;
+    [SerializeField] private HealthController _healthController;
 
     private float _inputH;
     private float _inputV;
@@ -24,6 +28,9 @@ public class PlayerController : Character
         mainCamera.parent = _cameraPoint;
         mainCamera.localPosition = Vector3.zero;
         mainCamera.localRotation = Quaternion.identity;
+
+        _healthController.SetMax(MaxHealth);
+        _healthController.SetCurrent(MaxHealth);
     }
 
     private void FixedUpdate()
@@ -78,5 +85,19 @@ public class PlayerController : Character
 
         rotateY = transform.eulerAngles.y;
         rotateX = _head.localEulerAngles.x;
+    }
+
+    public void OnChange(List<DataChange> changes)
+    {
+        foreach (var dataChange in changes)
+        {
+            switch (dataChange.Field)
+            {
+                case "currHp": _healthController.SetCurrent((sbyte)dataChange.Value); break;
+
+                // default: Debug.LogWarning("incorrect field " + dataChange.Field);
+                //     break;
+            }
+        }
     }
 }

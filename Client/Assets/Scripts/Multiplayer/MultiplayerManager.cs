@@ -25,7 +25,8 @@ namespace Multiplayer
         {
             var data = new Dictionary<string, object>()
             {
-                { "speed", _player.Speed }
+                { "speed", _player.Speed },
+                { "hp", _player.MaxHealth }
             };
 
             _room = await Instance.client.JoinOrCreate<State>("state_handler", data);
@@ -67,14 +68,15 @@ namespace Multiplayer
         private void CreatePlayer(Player player)
         {
             var pos = new Vector3(player.pX , player.pY, player.pZ);
-            Instantiate(_player, pos, Quaternion.identity);
+            var playerModel = Instantiate(_player, pos, Quaternion.identity);
+            player.OnChange += playerModel.OnChange;
         }
 
         private void CreateEnemy(string key, Player player)
         {
             var pos = new Vector3(player.pX , player.pY, player.pZ);
             var enemy = Instantiate(_enemy, pos, Quaternion.identity);
-            enemy.Init(player);
+            enemy.Init(player, key);
 
             _enemies.Add(key, enemy);
         }

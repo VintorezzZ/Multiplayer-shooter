@@ -7,6 +7,7 @@ namespace Armory.Weapons
         [SerializeField] private Transform _bulletPoint;
         [SerializeField] private float _bulletSpeed = 10f;
         [SerializeField] private float _shootDelay = 0.2f;
+        [SerializeField] private int _damage = 10;
 
         private float _lastShootTime;
 
@@ -23,7 +24,7 @@ namespace Armory.Weapons
 
             _lastShootTime = Time.time;
             var bullet = Instantiate(_bulletPrefab, position, _bulletPoint.rotation);
-            bullet.Init(velocity);
+            bullet.Init(velocity, _damage);
             ShootAction?.Invoke();
 
             info.PosX = position.x;
